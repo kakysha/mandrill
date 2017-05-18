@@ -1,6 +1,6 @@
 # Mandrill API via Golang
 
-[![Build Status](https://travis-ci.org/keighl/mandrill.png?branch=master)](https://travis-ci.org/keighl/mandrill) [![Coverage Status](https://coveralls.io/repos/keighl/mandrill/badge.svg)](https://coveralls.io/r/keighl/mandrill)
+[![Build Status](https://travis-ci.org/kakysha/mandrill.png?branch=master)](https://travis-ci.org/kakysha/mandrill) [![Coverage Status](https://coveralls.io/repos/kakysha/mandrill/badge.svg)](https://coveralls.io/r/kakysha/mandrill)
 
 Stripped down package for sending emails through the Mandrill API. Inspired by [@mostafah's implementation](https://github.com/mostafah/mandrill).
 
@@ -19,7 +19,7 @@ https://mandrillapp.com/api/docs/messages.JSON.html#method=send
 
 ```go
 import (
-    m "github.com/keighl/mandrill"
+    m "github.com/kakysha/mandrill"
 )
 
 client := m.ClientWithKey("XXXXXXXXX")
