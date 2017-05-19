@@ -188,7 +188,7 @@ type To struct {
 	Name string `json:"name,omitempty"`
 	// the header type to use for the recipient, defaults to "to" if not provided
 	// oneof(to, cc, bcc)
-	Type string `json:"type,omitempty"`
+	Type RecipientType `json:"type,omitempty"`
 }
 
 // Variable is key/value data used throughout the Mandrill API
@@ -263,6 +263,7 @@ func ClientWithKey(key string) *Client {
 	}
 }
 
+// Ping checks that the Client is able to communicate with Mandrill's remote services.
 func (c *Client) Ping() (pong string, err error) {
 	var data struct {
 		Key string `json:"key"`
@@ -329,7 +330,7 @@ func (c *Client) MessagesSendTemplate(message *Message, templateName string, con
 	return c.sendMessagePayload(data, "messages/send-template.json")
 }
 
-// Add a new template
+// AddTemplate adds a new template
 func (c *Client) AddTemplate(template *Template) (response *Template, err error) {
 
 	template.Key = c.Key
@@ -343,7 +344,7 @@ func (c *Client) AddTemplate(template *Template) (response *Template, err error)
 	return response, err
 }
 
-// Update template
+// UpdateTemplate updates a template
 func (c *Client) UpdateTemplate(template *Template) (response *Template, err error) {
 
 	template.Key = c.Key
@@ -357,7 +358,7 @@ func (c *Client) UpdateTemplate(template *Template) (response *Template, err err
 	return response, err
 }
 
-// Delete template
+// DeleteTemplate removes a template
 func (c *Client) DeleteTemplate(template_name string) (response *Template, err error) {
 
 	var data struct {
@@ -377,7 +378,7 @@ func (c *Client) DeleteTemplate(template_name string) (response *Template, err e
 	return response, err
 }
 
-// Get template
+// TemplateInfo gets a template
 func (c *Client) TemplateInfo(template_name string) (response *Template, err error) {
 
 	var data struct {
@@ -397,7 +398,7 @@ func (c *Client) TemplateInfo(template_name string) (response *Template, err err
 	return response, err
 }
 
-// Add a new subaccount
+// AddSubaccount adds a new subaccount
 func (c *Client) AddSubaccount(subaccount *Subaccount) (response *Subaccount, err error) {
 
 	subaccount.Key = c.Key
@@ -411,7 +412,7 @@ func (c *Client) AddSubaccount(subaccount *Subaccount) (response *Subaccount, er
 	return response, err
 }
 
-// Update subaccount
+// UpdateSubaccount updates a subaccount
 func (c *Client) UpdateSubaccount(subaccount *Subaccount) (response *Subaccount, err error) {
 
 	subaccount.Key = c.Key
@@ -425,7 +426,7 @@ func (c *Client) UpdateSubaccount(subaccount *Subaccount) (response *Subaccount,
 	return response, err
 }
 
-// Delete Subaccount
+// DeleteSubaccount removes a subaccount
 func (c *Client) DeleteSubaccount(subaccount_id string) (response *Subaccount, err error) {
 
 	var data struct {
@@ -445,7 +446,7 @@ func (c *Client) DeleteSubaccount(subaccount_id string) (response *Subaccount, e
 	return response, err
 }
 
-// Get subaccount info
+// SubaccountInfo gets subaccount info
 func (c *Client) SubaccountInfo(subaccount_id string) (response *Subaccount, err error) {
 
 	var data struct {
@@ -465,11 +466,51 @@ func (c *Client) SubaccountInfo(subaccount_id string) (response *Subaccount, err
 	return response, err
 }
 
+// RecipientType represents the type of recipient (to, cc, bcc)
+type RecipientType string
+
+const (
+	// TO indicates that this is a primary recipient
+	TO RecipientType = "to"
+	// CC indicates that this is a secondary recipient
+	CC RecipientType = "cc"
+	// BCC indicates that this is a secret recipient
+	BCC RecipientType = "bcc"
+)
+
 // AddRecipient appends a recipient to the message
 // easier than message.To = []*To{&To{email, name}}
-func (m *Message) AddRecipient(email string, name string, sendType string) {
+func (m *Message) AddRecipient(email string, name string, sendType RecipientType) {
 	to := &To{email, name, sendType}
 	m.To = append(m.To, to)
+}
+
+// AddTo adds a recipient with type "to"
+func (m *Message) AddTo(email, name string) {
+	m.AddRecipient(email, name, TO)
+}
+
+// AddCC adds a recipient with type "cc"
+func (m *Message) AddCC(email, name string) {
+	m.AddRecipient(email, name, CC)
+}
+
+// AddBCC adds a recipient with type "bcc"
+func (m *Message) AddBCC(email, name string) {
+	m.AddRecipient(email, name, BCC)
+}
+
+// AddVariable adds a map of values to the message
+func (m *Message) AddVariable(email, key string, value interface{}) {
+	values := make(map[string]interface{})
+	values[key] = value
+	m.AddVariables(email, values)
+}
+
+// AddVariables adds a map of values to the message
+func (m *Message) AddVariables(email string, values map[string]interface{}) {
+	recipientMergeVars := MapToRecipientVars(email, values)
+	m.MergeVars = append(m.MergeVars, recipientMergeVars)
 }
 
 func (c *Client) sendMessagePayload(data interface{}, path string) (responses []*MessagesResponse, err error) {
@@ -506,7 +547,7 @@ func (c *Client) sendApiRequest(data interface{}, path string) (body []byte, err
 
 	if resp.StatusCode >= 400 {
 		resError := &Error{}
-		err = json.Unmarshal(body, resError)
+		json.Unmarshal(body, resError)
 		return body, resError
 	}
 
