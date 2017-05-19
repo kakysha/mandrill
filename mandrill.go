@@ -52,6 +52,22 @@ import (
 	"net/http"
 )
 
+// EmailClient defines the methods for a Mandrill Client
+type EmailClient interface {
+	Ping() (pong string, err error)
+	MessagesSend(message *Message) (responses []*MessagesResponse, err error)
+	MessagesSendTemplate(message *Message, templateName string, contents interface{}) (
+		responses []*MessagesResponse, err error)
+	SubaccountInfo(subaccountID string) (response *Subaccount, err error)
+	AddSubaccount(subaccount *Subaccount) (response *Subaccount, err error)
+	DeleteSubaccount(subaccountID string) (response *Subaccount, err error)
+	UpdateSubaccount(subaccount *Subaccount) (response *Subaccount, err error)
+	TemplateInfo(templateName string) (response *Template, err error)
+	AddTemplate(template *Template) (response *Template, err error)
+	DeleteTemplate(templateName string) (response *Template, err error)
+	UpdateTemplate(template *Template) (response *Template, err error)
+}
+
 // Client manages requests to the Mandrill API
 type Client struct {
 	// mandrill API key
@@ -271,7 +287,7 @@ func (c *Client) Ping() (pong string, err error) {
 
 	data.Key = c.Key
 
-	body, err := c.sendApiRequest(data, "users/ping.json")
+	body, err := c.sendAPIRequest(data, "users/ping.json")
 	if err != nil {
 		return pong, err
 	}
@@ -335,7 +351,7 @@ func (c *Client) AddTemplate(template *Template) (response *Template, err error)
 
 	template.Key = c.Key
 
-	body, err := c.sendApiRequest(template, "templates/add.json")
+	body, err := c.sendAPIRequest(template, "templates/add.json")
 	if err != nil {
 		return nil, err
 	}
@@ -349,7 +365,7 @@ func (c *Client) UpdateTemplate(template *Template) (response *Template, err err
 
 	template.Key = c.Key
 
-	body, err := c.sendApiRequest(template, "templates/update.json")
+	body, err := c.sendAPIRequest(template, "templates/update.json")
 	if err != nil {
 		return response, err
 	}
@@ -359,7 +375,7 @@ func (c *Client) UpdateTemplate(template *Template) (response *Template, err err
 }
 
 // DeleteTemplate removes a template
-func (c *Client) DeleteTemplate(template_name string) (response *Template, err error) {
+func (c *Client) DeleteTemplate(templateName string) (response *Template, err error) {
 
 	var data struct {
 		Key  string `json:"key"`
@@ -367,9 +383,9 @@ func (c *Client) DeleteTemplate(template_name string) (response *Template, err e
 	}
 
 	data.Key = c.Key
-	data.Name = template_name
+	data.Name = templateName
 
-	body, err := c.sendApiRequest(data, "templates/delete.json")
+	body, err := c.sendAPIRequest(data, "templates/delete.json")
 	if err != nil {
 		return response, err
 	}
@@ -379,7 +395,7 @@ func (c *Client) DeleteTemplate(template_name string) (response *Template, err e
 }
 
 // TemplateInfo gets a template
-func (c *Client) TemplateInfo(template_name string) (response *Template, err error) {
+func (c *Client) TemplateInfo(templateName string) (response *Template, err error) {
 
 	var data struct {
 		Key  string `json:"key"`
@@ -387,9 +403,9 @@ func (c *Client) TemplateInfo(template_name string) (response *Template, err err
 	}
 
 	data.Key = c.Key
-	data.Name = template_name
+	data.Name = templateName
 
-	body, err := c.sendApiRequest(data, "templates/info.json")
+	body, err := c.sendAPIRequest(data, "templates/info.json")
 	if err != nil {
 		return response, err
 	}
@@ -403,7 +419,7 @@ func (c *Client) AddSubaccount(subaccount *Subaccount) (response *Subaccount, er
 
 	subaccount.Key = c.Key
 
-	body, err := c.sendApiRequest(subaccount, "subaccounts/add.json")
+	body, err := c.sendAPIRequest(subaccount, "subaccounts/add.json")
 	if err != nil {
 		return nil, err
 	}
@@ -417,7 +433,7 @@ func (c *Client) UpdateSubaccount(subaccount *Subaccount) (response *Subaccount,
 
 	subaccount.Key = c.Key
 
-	body, err := c.sendApiRequest(subaccount, "subaccounts/update.json")
+	body, err := c.sendAPIRequest(subaccount, "subaccounts/update.json")
 	if err != nil {
 		return nil, err
 	}
@@ -427,17 +443,17 @@ func (c *Client) UpdateSubaccount(subaccount *Subaccount) (response *Subaccount,
 }
 
 // DeleteSubaccount removes a subaccount
-func (c *Client) DeleteSubaccount(subaccount_id string) (response *Subaccount, err error) {
+func (c *Client) DeleteSubaccount(subaccountID string) (response *Subaccount, err error) {
 
 	var data struct {
 		Key string `json:"key"`
-		Id  string `json:"id"`
+		ID  string `json:"id"`
 	}
 
 	data.Key = c.Key
-	data.Id = subaccount_id
+	data.ID = subaccountID
 
-	body, err := c.sendApiRequest(data, "subaccounts/delete.json")
+	body, err := c.sendAPIRequest(data, "subaccounts/delete.json")
 	if err != nil {
 		return response, err
 	}
@@ -447,17 +463,17 @@ func (c *Client) DeleteSubaccount(subaccount_id string) (response *Subaccount, e
 }
 
 // SubaccountInfo gets subaccount info
-func (c *Client) SubaccountInfo(subaccount_id string) (response *Subaccount, err error) {
+func (c *Client) SubaccountInfo(subaccountID string) (response *Subaccount, err error) {
 
 	var data struct {
 		Key string `json:"key"`
-		Id  string `json:"id"`
+		ID  string `json:"id"`
 	}
 
 	data.Key = c.Key
-	data.Id = subaccount_id
+	data.ID = subaccountID
 
-	body, err := c.sendApiRequest(data, "subaccounts/info.json")
+	body, err := c.sendAPIRequest(data, "subaccounts/info.json")
 	if err != nil {
 		return response, err
 	}
@@ -522,7 +538,7 @@ func (c *Client) sendMessagePayload(data interface{}, path string) (responses []
 		return nil, errors.New("SANDBOX_ERROR")
 	}
 
-	body, err := c.sendApiRequest(data, path)
+	body, err := c.sendAPIRequest(data, path)
 	if err != nil {
 		return responses, err
 	}
@@ -531,7 +547,7 @@ func (c *Client) sendMessagePayload(data interface{}, path string) (responses []
 	return responses, err
 }
 
-func (c *Client) sendApiRequest(data interface{}, path string) (body []byte, err error) {
+func (c *Client) sendAPIRequest(data interface{}, path string) (body []byte, err error) {
 	payload, _ := json.Marshal(data)
 
 	resp, err := c.HTTPClient.Post(c.BaseURL+path, "application/json", bytes.NewReader(payload))
