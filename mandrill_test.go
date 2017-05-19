@@ -657,9 +657,58 @@ func Test_SANDBOX_ERROR(t *testing.T) {
 
 func Test_AddRecipient(t *testing.T) {
 	m := &Message{}
-	m.AddRecipient("bob@example.com", "Bob Johnson", "to")
-	tos := []*To{&To{"bob@example.com", "Bob Johnson", "to"}}
+	m.AddRecipient("bob@example.com", "Bob Johnson", TO)
+	tos := []*To{&To{"bob@example.com", "Bob Johnson", TO}}
 	expect(t, reflect.DeepEqual(m.To, tos), true)
+}
+
+func Test_AddTo(t *testing.T) {
+	m := &Message{}
+	m.AddTo("bob@example.com", "Bob Johnson")
+	tos := []*To{&To{"bob@example.com", "Bob Johnson", TO}}
+	expect(t, reflect.DeepEqual(m.To, tos), true)
+}
+
+func Test_AddCC(t *testing.T) {
+	m := &Message{}
+	m.AddCC("bob@example.com", "Bob Johnson")
+	tos := []*To{&To{"bob@example.com", "Bob Johnson", CC}}
+	expect(t, reflect.DeepEqual(m.To, tos), true)
+}
+
+func Test_AddBCC(t *testing.T) {
+	m := &Message{}
+	m.AddBCC("bob@example.com", "Bob Johnson")
+	tos := []*To{&To{"bob@example.com", "Bob Johnson", BCC}}
+	expect(t, reflect.DeepEqual(m.To, tos), true)
+}
+
+func Test_AddVariable(t *testing.T) {
+	m := &Message{}
+	email := "bob@example.com"
+
+	mergeValues := make(map[string]interface{})
+	mergeValues["address"] = "123 Fake St."
+
+	recipientMergeVars := MapToRecipientVars(email, mergeValues)
+	expected := append(m.MergeVars, recipientMergeVars)
+
+	m.AddVariable(email, "address", "123 Fake St.")
+	expect(t, reflect.DeepEqual(m.MergeVars, expected), true)
+}
+
+func Test_AddVariables(t *testing.T) {
+	m := &Message{}
+	email := "bob@example.com"
+
+	mergeValues := make(map[string]interface{})
+	mergeValues["address"] = "123 Fake St."
+
+	recipientMergeVars := MapToRecipientVars(email, mergeValues)
+	expected := append(m.MergeVars, recipientMergeVars)
+
+	m.AddVariables(email, mergeValues)
+	expect(t, reflect.DeepEqual(m.MergeVars, expected), true)
 }
 
 // ConvertMapToVariables /////
