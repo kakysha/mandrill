@@ -689,11 +689,15 @@ func Test_AddVariable(t *testing.T) {
 
 	mergeValues := make(map[string]interface{})
 	mergeValues["address"] = "123 Fake St."
+	mergeValues["name"] = "John Doe"
 
 	recipientMergeVars := MapToRecipientVars(email, mergeValues)
 	expected := append(m.MergeVars, recipientMergeVars)
 
 	m.AddVariable(email, "address", "123 Fake St.")
+	m.AddVariable(email, "name", "John Doe")
+	m.MapVariablesToRecipient()
+	expect(t, reflect.DeepEqual(m.recipientMergeVarMap[email], mergeValues), true)
 	expect(t, reflect.DeepEqual(m.MergeVars, expected), true)
 }
 
@@ -708,6 +712,13 @@ func Test_AddVariables(t *testing.T) {
 	expected := append(m.MergeVars, recipientMergeVars)
 
 	m.AddVariables(email, mergeValues)
+	expect(t, reflect.DeepEqual(m.MergeVars, expected), true)
+}
+
+func Test_MapVariablesToRecipient(t *testing.T) {
+	m := &Message{}
+	expected := m.MergeVars
+	m.MapVariablesToRecipient()
 	expect(t, reflect.DeepEqual(m.MergeVars, expected), true)
 }
 
