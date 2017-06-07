@@ -7,7 +7,7 @@ import (
 	"github.com/Kasita-Inc/mandrill"
 )
 
-// TestClient implementes the EmailClient interface for testing
+// TestClient implements the EmailClient interface for testing
 type TestClient struct {
 	APIKey       string
 	Templates    map[string]*mandrill.Template
@@ -18,7 +18,7 @@ type TestClient struct {
 	Contents     interface{}
 }
 
-// GetClient returns an active TestClient
+// NewClient returns a TestClient
 func NewClient(apiKey string) (client *TestClient) {
 	return &TestClient{
 		OK:          true,
@@ -93,10 +93,10 @@ func (client *TestClient) UpdateSubaccount(subaccount *mandrill.Subaccount) (res
 	if !client.OK {
 		return nil, errors.New("UpdateSubaccount failed")
 	}
-	if _, ok := client.Subaccounts[subaccount.Id]; !ok {
-		return nil, fmt.Errorf("no subaccount (%s) found", subaccount.Id)
+	if _, ok := client.Subaccounts[subaccount.ID]; !ok {
+		return nil, fmt.Errorf("no subaccount (%s) found", subaccount.ID)
 	}
-	client.Subaccounts[subaccount.Id] = subaccount
+	client.Subaccounts[subaccount.ID] = subaccount
 	return subaccount, nil
 }
 
@@ -105,10 +105,10 @@ func (client *TestClient) AddSubaccount(subaccount *mandrill.Subaccount) (respon
 	if !client.OK {
 		return nil, errors.New("AddSubaccount failed")
 	}
-	if _, ok := client.Subaccounts[subaccount.Id]; ok {
-		return nil, fmt.Errorf("subaccount (%s) already exists", subaccount.Id)
+	if _, ok := client.Subaccounts[subaccount.ID]; ok {
+		return nil, fmt.Errorf("subaccount (%s) already exists", subaccount.ID)
 	}
-	client.Subaccounts[subaccount.Id] = subaccount
+	client.Subaccounts[subaccount.ID] = subaccount
 	return subaccount, nil
 }
 

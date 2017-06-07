@@ -184,18 +184,18 @@ type Subaccount struct {
 	// api key
 	Key string `json:"key"`
 	// subaccount id
-	Id    string `json:"id"`
+	ID    string `json:"id"`
 	Name  string `json:"name,omitempty"`
 	Notes string `json:"notes,omitempty"`
 	// custom quota (hourly)
 	Quota int `json:"custom_quota,omitempty"`
 	// response only fields
-	Reputation   int    `json:"reputation,omitempty"`
-	Status       string `json:"status,omitempty"`
-	Sent_hourly  int    `json:"sent_hourly,omitempty"`
-	Sent_weekly  int    `json:"sent_weekly,omitempty"`
-	Sent_monthly int    `json:"sent_monthly,omitempty"`
-	Sent_total   int    `json:"sent_total,omitempty"`
+	Reputation  int    `json:"reputation,omitempty"`
+	Status      string `json:"status,omitempty"`
+	SentHourly  int    `json:"sent_hourly,omitempty"`
+	SentWeekly  int    `json:"sent_weekly,omitempty"`
+	SentMonthly int    `json:"sent_monthly,omitempty"`
+	SentTotal   int    `json:"sent_total,omitempty"`
 }
 
 // To is a single recipient's information.
@@ -250,7 +250,7 @@ type MessagesResponse struct {
 	// the reason for the rejection if the recipient status is "rejected" - one of "hard-bounce", "soft-bounce", "spam", "unsub", "custom", "invalid-sender", "invalid", "test-mode-limit", or "rule"
 	RejectionReason string `json:"reject_reason"`
 	// the message's unique id
-	Id string `json:"_id"`
+	ID string `json:"_id"`
 }
 
 // Error reprents an error from the Mandrill API
