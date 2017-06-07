@@ -1,6 +1,6 @@
 # Mandrill API via Golang
 
-[![Build Status](https://travis-ci.org/kakysha/mandrill.png?branch=master)](https://travis-ci.org/kakysha/mandrill) [![Coverage Status](https://coveralls.io/repos/kakysha/mandrill/badge.svg)](https://coveralls.io/r/kakysha/mandrill)
+[![CircleCI](https://circleci.com/gh/Kasita-Inc/mandrill.svg?style=shield)](https://circleci.com/gh/Kasita-Inc/mandrill) [![Go Report Card](https://goreportcard.com/badge/github.com/Kasita-Inc/mandrill)](https://goreportcard.com/report/github.com/Kasita-Inc/mandrill)
 
 Stripped down package for sending emails through the Mandrill API. Inspired by [@mostafah's implementation](https://github.com/mostafah/mandrill).
 
