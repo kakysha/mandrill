@@ -658,28 +658,28 @@ func Test_SANDBOX_ERROR(t *testing.T) {
 func Test_AddRecipient(t *testing.T) {
 	m := &Message{}
 	m.AddRecipient("bob@example.com", "Bob Johnson", TO)
-	tos := []*To{&To{"bob@example.com", "Bob Johnson", TO}}
+	tos := []*To{{"bob@example.com", "Bob Johnson", TO}}
 	expect(t, reflect.DeepEqual(m.To, tos), true)
 }
 
 func Test_AddTo(t *testing.T) {
 	m := &Message{}
 	m.AddTo("bob@example.com", "Bob Johnson")
-	tos := []*To{&To{"bob@example.com", "Bob Johnson", TO}}
+	tos := []*To{{"bob@example.com", "Bob Johnson", TO}}
 	expect(t, reflect.DeepEqual(m.To, tos), true)
 }
 
 func Test_AddCC(t *testing.T) {
 	m := &Message{}
 	m.AddCC("bob@example.com", "Bob Johnson")
-	tos := []*To{&To{"bob@example.com", "Bob Johnson", CC}}
+	tos := []*To{{"bob@example.com", "Bob Johnson", CC}}
 	expect(t, reflect.DeepEqual(m.To, tos), true)
 }
 
 func Test_AddBCC(t *testing.T) {
 	m := &Message{}
 	m.AddBCC("bob@example.com", "Bob Johnson")
-	tos := []*To{&To{"bob@example.com", "Bob Johnson", BCC}}
+	tos := []*To{{"bob@example.com", "Bob Johnson", BCC}}
 	expect(t, reflect.DeepEqual(m.To, tos), true)
 }
 
@@ -727,14 +727,14 @@ func Test_MapVariablesToRecipient(t *testing.T) {
 func Test_ConvertMapToVariables(t *testing.T) {
 	m := map[string]interface{}{"name": "bob"}
 	target := ConvertMapToVariables(m)
-	hand := []*Variable{&Variable{"name", "bob"}}
+	hand := []*Variable{{"name", "bob"}}
 	expect(t, reflect.DeepEqual(target, hand), true)
 }
 
 func Test_ConvertMapToVariables_WithString(t *testing.T) {
 	m := map[string]string{"name": "bob"}
 	target := ConvertMapToVariables(m)
-	hand := []*Variable{&Variable{"name", "bob"}}
+	hand := []*Variable{{"name", "bob"}}
 	expect(t, reflect.DeepEqual(target, hand), true)
 }
 
@@ -746,7 +746,7 @@ func Test_ConvertMapToVariables_BadType(t *testing.T) {
 func Test_MapToVars(t *testing.T) {
 	m := map[string]interface{}{"name": "bob"}
 	target := MapToVars(m)
-	hand := []*Variable{&Variable{"name", "bob"}}
+	hand := []*Variable{{"name", "bob"}}
 	expect(t, reflect.DeepEqual(target, hand), true)
 }
 
