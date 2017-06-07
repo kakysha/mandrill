@@ -61,7 +61,7 @@ func Test_MessagesSendTemplate_Success(t *testing.T) {
 		Email:           "bob@example.com",
 		Status:          "sent",
 		RejectionReason: "hard-bounce",
-		Id:              "1",
+		ID:              "1",
 	}
 	expect(t, reflect.DeepEqual(correctMessagesResponse, responses[0]), true)
 }
@@ -96,7 +96,7 @@ func Test_MessageSend_Success(t *testing.T) {
 		Email:           "bob@example.com",
 		Status:          "sent",
 		RejectionReason: "hard-bounce",
-		Id:              "1",
+		ID:              "1",
 	}
 	expect(t, reflect.DeepEqual(correctMessagesResponse, responses[0]), true)
 }
@@ -419,15 +419,15 @@ func Test_AddSubaccount_Success(t *testing.T) {
 	expect(t, err, nil)
 
 	correctResponse := &Subaccount{
-		Id:           "cust-123",
-		Name:         "ABD Widgets, Inc.",
-		Quota:        42,
-		Reputation:   42,
-		Status:       "active",
-		Sent_hourly:  0,
-		Sent_weekly:  42,
-		Sent_monthly: 42,
-		Sent_total:   42,
+		ID:          "cust-123",
+		Name:        "ABD Widgets, Inc.",
+		Quota:       42,
+		Reputation:  42,
+		Status:      "active",
+		SentHourly:  0,
+		SentWeekly:  42,
+		SentMonthly: 42,
+		SentTotal:   42,
 	}
 	expect(t, reflect.DeepEqual(correctResponse, response), true)
 }
@@ -476,15 +476,15 @@ func Test_UpdateSubaccount_Success(t *testing.T) {
 	expect(t, err, nil)
 
 	correctResponse := &Subaccount{
-		Id:           "cust-123",
-		Name:         "ABD Widgets, Inc.",
-		Quota:        43,
-		Reputation:   43,
-		Status:       "active",
-		Sent_hourly:  0,
-		Sent_weekly:  43,
-		Sent_monthly: 43,
-		Sent_total:   43,
+		ID:          "cust-123",
+		Name:        "ABD Widgets, Inc.",
+		Quota:       43,
+		Reputation:  43,
+		Status:      "active",
+		SentHourly:  0,
+		SentWeekly:  43,
+		SentMonthly: 43,
+		SentTotal:   43,
 	}
 	expect(t, reflect.DeepEqual(correctResponse, response), true)
 }
@@ -533,15 +533,15 @@ func Test_DeleteSubaccount_Success(t *testing.T) {
 	expect(t, err, nil)
 
 	correctResponse := &Subaccount{
-		Id:           "cust-123",
-		Name:         "ABD Widgets, Inc.",
-		Quota:        43,
-		Reputation:   43,
-		Status:       "active",
-		Sent_hourly:  0,
-		Sent_weekly:  43,
-		Sent_monthly: 43,
-		Sent_total:   43,
+		ID:          "cust-123",
+		Name:        "ABD Widgets, Inc.",
+		Quota:       43,
+		Reputation:  43,
+		Status:      "active",
+		SentHourly:  0,
+		SentWeekly:  43,
+		SentMonthly: 43,
+		SentTotal:   43,
 	}
 	expect(t, reflect.DeepEqual(correctResponse, response), true)
 }
@@ -604,16 +604,16 @@ func Test_SubaccountInfo_Success(t *testing.T) {
 	expect(t, err, nil)
 
 	correctResponse := &Subaccount{
-		Id:           "cust-123",
-		Name:         "ABC Widgets, Inc.",
-		Notes:        "Free plan user, signed up on 2013-01-01 12:00:00",
-		Quota:        42,
-		Reputation:   42,
-		Status:       "active",
-		Sent_hourly:  42,
-		Sent_weekly:  42,
-		Sent_monthly: 42,
-		Sent_total:   42,
+		ID:          "cust-123",
+		Name:        "ABC Widgets, Inc.",
+		Notes:       "Free plan user, signed up on 2013-01-01 12:00:00",
+		Quota:       42,
+		Reputation:  42,
+		Status:      "active",
+		SentHourly:  42,
+		SentWeekly:  42,
+		SentMonthly: 42,
+		SentTotal:   42,
 	}
 	expect(t, reflect.DeepEqual(correctResponse, response), true)
 }
