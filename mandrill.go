@@ -128,6 +128,8 @@ type Message struct {
 	GlobalMergeVars []*Variable `json:"global_merge_vars,omitempty"`
 	// per-recipient merge variables, which override global merge variables with the same name.
 	MergeVars []*RcptMergeVars `json:"merge_vars,omitempty"`
+	// temporary hold for recipient merge variables
+	recipientMergeVarMap map[string]map[string]interface{}
 	// an array of string to tag the message with. Stats are accumulated using tags, though we only store the first 100 we see, so this should not be unique or change frequently. Tags should be 50 characters or less. Any tags starting with an underscore are reserved for internal use and will cause errors.
 	Tags []string `json:"tags,omitempty"`
 	// the unique id of a subaccount for this message - must already exist or will fail with an error
@@ -182,18 +184,18 @@ type Subaccount struct {
 	// api key
 	Key string `json:"key"`
 	// subaccount id
-	Id    string `json:"id"`
+	ID    string `json:"id"`
 	Name  string `json:"name,omitempty"`
 	Notes string `json:"notes,omitempty"`
 	// custom quota (hourly)
 	Quota int `json:"custom_quota,omitempty"`
 	// response only fields
-	Reputation   int    `json:"reputation,omitempty"`
-	Status       string `json:"status,omitempty"`
-	Sent_hourly  int    `json:"sent_hourly,omitempty"`
-	Sent_weekly  int    `json:"sent_weekly,omitempty"`
-	Sent_monthly int    `json:"sent_monthly,omitempty"`
-	Sent_total   int    `json:"sent_total,omitempty"`
+	Reputation  int    `json:"reputation,omitempty"`
+	Status      string `json:"status,omitempty"`
+	SentHourly  int    `json:"sent_hourly,omitempty"`
+	SentWeekly  int    `json:"sent_weekly,omitempty"`
+	SentMonthly int    `json:"sent_monthly,omitempty"`
+	SentTotal   int    `json:"sent_total,omitempty"`
 }
 
 // To is a single recipient's information.
@@ -248,7 +250,7 @@ type MessagesResponse struct {
 	// the reason for the rejection if the recipient status is "rejected" - one of "hard-bounce", "soft-bounce", "spam", "unsub", "custom", "invalid-sender", "invalid", "test-mode-limit", or "rule"
 	RejectionReason string `json:"reject_reason"`
 	// the message's unique id
-	Id string `json:"_id"`
+	ID string `json:"_id"`
 }
 
 // Error reprents an error from the Mandrill API
@@ -298,6 +300,7 @@ func (c *Client) Ping() (pong string, err error) {
 
 // MessagesSend sends a message via an API client
 func (c *Client) MessagesSend(message *Message) (responses []*MessagesResponse, err error) {
+	message.MapVariablesToRecipient()
 
 	var data struct {
 		Key     string   `json:"key"`
@@ -321,6 +324,7 @@ func (c *Client) MessagesSend(message *Message) (responses []*MessagesResponse, 
 
 // MessagesSendTemplate sends a message using a Mandrill template
 func (c *Client) MessagesSendTemplate(message *Message, templateName string, contents interface{}) (responses []*MessagesResponse, err error) {
+	message.MapVariablesToRecipient()
 
 	var data struct {
 		Key             string      `json:"key"`
@@ -518,15 +522,29 @@ func (m *Message) AddBCC(email, name string) {
 
 // AddVariable adds a map of values to the message
 func (m *Message) AddVariable(email, key string, value interface{}) {
-	values := make(map[string]interface{})
-	values[key] = value
-	m.AddVariables(email, values)
+	if nil == m.recipientMergeVarMap {
+		m.recipientMergeVarMap = make(map[string]map[string]interface{})
+	}
+	if _, ok := m.recipientMergeVarMap[email]; !ok {
+		m.recipientMergeVarMap[email] = make(map[string]interface{})
+	}
+	m.recipientMergeVarMap[email][key] = value
 }
 
 // AddVariables adds a map of values to the message
 func (m *Message) AddVariables(email string, values map[string]interface{}) {
 	recipientMergeVars := MapToRecipientVars(email, values)
 	m.MergeVars = append(m.MergeVars, recipientMergeVars)
+}
+
+// MapVariablesToRecipient maps the variables added for a recipient to the MergeVars
+func (m *Message) MapVariablesToRecipient() {
+	if nil == m.recipientMergeVarMap {
+		return
+	}
+	for email, values := range m.recipientMergeVarMap {
+		m.AddVariables(email, values)
+	}
 }
 
 func (c *Client) sendMessagePayload(data interface{}, path string) (responses []*MessagesResponse, err error) {
